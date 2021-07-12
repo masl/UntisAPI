@@ -1,7 +1,6 @@
-package Untis
+package UntisAPI
 
 import (
-	"log"
 	"strings"
 )
 
@@ -19,10 +18,4 @@ func removeEmptiStrings(strings ...string) []string {
 		}
 	}
 	return strings
-}
-
-func checkError(err error) {
-	if err != nil {
-		log.Fatalf("An Error Occured %v\n", err)
-	}
 }

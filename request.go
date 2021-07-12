@@ -1,4 +1,4 @@
-package Untis
+package UntisAPI
 
 import (
 	"bytes"
@@ -43,13 +43,23 @@ type request struct {
 	Version string      `json:"jsonrpc"`
 	Params  interface{} `json:"params"`
 }
+type APIerror struct {
+	Message string  `json:"message"`
+	Code    float64 `json:"code"`
+}
+
+func (err APIerror) Error() string {
+	return fmt.Sprintf("%s Code: %.0f", err.Message, err.Code)
+}
+
 type response struct {
 	Id      string      `json:"id"`
 	Version string      `json:"jsonrpc"`
 	Result  interface{} `json:"result"`
+	Error   APIerror    `json:"error"`
 }
 
-func (u *User) request(mehtode string, jsonParam interface{}) response {
+func (u *User) request(mehtode string, jsonParam interface{}) (response, error) {
 	url := u.server + "/WebUntis/jsonrpc.do" + "?school=" + u.school
 
 	request := request{
@@ -65,27 +75,35 @@ func (u *User) request(mehtode string, jsonParam interface{}) response {
 
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, responseBody)
-	checkError(err)
+	if err != nil {
+		return response{}, err
+	}
 
 	if u.loginResp.SessionId != "" {
 		req.AddCookie(&http.Cookie{Name: "JSESSIONID", Value: u.loginResp.SessionId})
 	}
 
 	res, err := client.Do(req)
-	checkError(err)
+	if err != nil {
+		return response{}, err
+	}
 
 	body, err := ioutil.ReadAll(res.Body)
-	checkError(err)
+	if err != nil {
+		return response{}, err
+	}
 
 	var response response
 	err = json.Unmarshal(body, &response)
-	checkError(err)
-
-	if response.Result == nil {
-		fmt.Println(string(body))
+	if err != nil {
+		return response, err
 	}
 
-	return response
+	if response.Error.Message != "" {
+		return response, response.Error
+	}
+
+	return response, nil
 }
 
 type loginParam struct {
@@ -100,16 +118,25 @@ type loginResp struct {
 	KlasseId   int
 }
 
-func (u *User) Login() {
-	response := u.request("authenticate", loginParam{
+func (u *User) Login() error {
+	response, err := u.request("authenticate", loginParam{
 		User:     u.username,
 		Password: u.password,
 		Client:   "UntisQuerry",
 	})
+	if err != nil {
+		return err
+	}
 
 	var loginResp loginResp
-	checkError(mapstructure.Decode(response.Result, &loginResp))
+	err = mapstructure.Decode(response.Result, &loginResp)
+	if err != nil {
+		return err
+	}
+
 	u.loginResp = loginResp
+
+	return nil
 }
 
 func (u *User) Logout() {

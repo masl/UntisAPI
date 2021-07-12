@@ -1,4 +1,4 @@
-package Untis
+package UntisAPI
 
 import "time"
 

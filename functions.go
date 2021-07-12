@@ -1,4 +1,4 @@
-package Untis
+package UntisAPI
 
 import (
 	"github.com/mitchellh/mapstructure"
@@ -14,18 +14,25 @@ type Teacher struct {
 	//Dids []interface{}
 }
 
-func (u *User) GetTeachers() map[int]Teacher {
-	response := u.request("getTeachers", nil)
+func (u *User) GetTeachers() (map[int]Teacher, error) {
+	response, err := u.request("getTeachers", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	teachers := map[int]Teacher{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var teacher Teacher
-		checkError(mapstructure.Decode(data, &teacher))
+		err := mapstructure.Decode(data, &teacher)
+		if err != nil {
+			return nil, err
+		}
+
 		teachers[teacher.Id] = teacher
 	}
 
-	return teachers
+	return teachers, nil
 }
 
 type Student struct {
@@ -37,18 +44,25 @@ type Student struct {
 	Gender   string
 }
 
-func (u *User) GetStudents() map[int]Student {
-	response := u.request("getStudents", nil)
+func (u *User) GetStudents() (map[int]Student, error) {
+	response, err := u.request("getStudents", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	students := map[int]Student{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var student Student
-		checkError(mapstructure.Decode(data, &student))
+		err := mapstructure.Decode(data, &student)
+		if err != nil {
+			return nil, err
+		}
+
 		students[student.Id] = student
 	}
 
-	return students
+	return students, nil
 }
 
 type Class struct {
@@ -60,18 +74,25 @@ type Class struct {
 	Teacher2 int
 }
 
-func (u *User) GetClasses() map[int]Class {
-	response := u.request("getKlassen", nil)
+func (u *User) GetClasses() (map[int]Class, error) {
+	response, err := u.request("getKlassen", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	classes := map[int]Class{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var class Class
-		checkError(mapstructure.Decode(data, &class))
+		err := mapstructure.Decode(data, &class)
+		if err != nil {
+			return nil, err
+		}
+
 		classes[class.Id] = class
 	}
 
-	return classes
+	return classes, nil
 }
 
 type Subject struct {
@@ -82,18 +103,25 @@ type Subject struct {
 	Active        bool
 }
 
-func (u *User) GetSubjectes() map[int]Subject {
-	response := u.request("getSubjects", nil)
+func (u *User) GetSubjectes() (map[int]Subject, error) {
+	response, err := u.request("getSubjects", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	subjectes := map[int]Subject{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var subject Subject
-		checkError(mapstructure.Decode(data, &subject))
+		err := mapstructure.Decode(data, &subject)
+		if err != nil {
+			return nil, err
+		}
+
 		subjectes[subject.Id] = subject
 	}
 
-	return subjectes
+	return subjectes, nil
 }
 
 type Room struct {
@@ -104,18 +132,25 @@ type Room struct {
 	Active   bool
 }
 
-func (u *User) GetRooms() map[int]Room {
-	response := u.request("getRooms", nil)
+func (u *User) GetRooms() (map[int]Room, error) {
+	response, err := u.request("getRooms", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	rooms := map[int]Room{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var room Room
-		checkError(mapstructure.Decode(data, &room))
+		err := mapstructure.Decode(data, &room)
+		if err != nil {
+			return nil, err
+		}
+
 		rooms[room.Id] = room
 	}
 
-	return rooms
+	return rooms, nil
 }
 
 type Schoolyear struct {
@@ -124,26 +159,39 @@ type Schoolyear struct {
 	EndDate   int
 }
 
-func (u *User) GetCurrentSchoolyear() Schoolyear {
-	response := u.request("getCurrentSchoolyear", nil)
+func (u *User) GetCurrentSchoolyear() (Schoolyear, error) {
+	response, err := u.request("getCurrentSchoolyear", nil)
+	if err != nil {
+		return Schoolyear{}, err
+	}
 
 	var year Schoolyear
-	checkError(mapstructure.Decode(response.Result, &year))
+	err = mapstructure.Decode(response.Result, &year)
+	if err != nil {
+		return Schoolyear{}, err
+	}
 
-	return year
+	return year, nil
 }
-func (u *User) GetSchoolyears() []Schoolyear {
-	response := u.request("getSchoolyears", nil)
+func (u *User) GetSchoolyears() ([]Schoolyear, error) {
+	response, err := u.request("getSchoolyears", nil)
+	if err != nil {
+		return nil, err
+	}
 
 	var years []Schoolyear
 	for _, data := range response.Result.([]interface{}) {
 
 		var year Schoolyear
-		checkError(mapstructure.Decode(data, &year))
+		err := mapstructure.Decode(data, &year)
+		if err != nil {
+			return nil, err
+		}
+
 		years = append(years, year)
 	}
 
-	return years
+	return years, err
 }
 
 type Period struct {
@@ -158,20 +206,26 @@ type Period struct {
 	Rooms        []int
 }
 
-func (u *User) GetTimeTable(id int, idtype int, startDate int, endDate int) map[int]Period {
+func (u *User) GetTimeTable(id int, idtype int, startDate int, endDate int) (map[int]Period, error) {
 	param := map[string]interface{}{
 		"id":        id,
 		"type":      idtype,
 		"startDate": startDate,
 		"endDate":   endDate,
 	}
-	response := u.request("getTimetable", param)
+	response, err := u.request("getTimetable", param)
+	if err != nil {
+		return nil, err
+	}
 
 	periods := map[int]Period{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var period Period
-		checkError(mapstructure.Decode(data, &period))
+		err := mapstructure.Decode(data, &period)
+		if err != nil {
+			return nil, err
+		}
 
 		dataMap := data.(map[string]interface{})
 		for _, klasse := range dataMap["kl"].([]interface{}) {
@@ -190,10 +244,10 @@ func (u *User) GetTimeTable(id int, idtype int, startDate int, endDate int) map[
 		periods[period.Id] = period
 
 	}
-	return periods
+	return periods, nil
 }
 
-func (u *User) GetPersonId(firstname string, lastname string, isTeacher bool) int {
+func (u *User) GetPersonId(firstname string, lastname string, isTeacher bool) (int, error) {
 	param := map[string]interface{}{
 		"fn":  firstname,
 		"sn":  lastname,
@@ -204,6 +258,6 @@ func (u *User) GetPersonId(firstname string, lastname string, isTeacher bool) in
 	} else {
 		param["type"] = "5"
 	}
-	response := u.request("getPersonId", param)
-	return int(response.Result.(float64))
+	response, err := u.request("getPersonId", param)
+	return int(response.Result.(float64)), err
 }
