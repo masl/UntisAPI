@@ -1,6 +1,9 @@
 package UntisAPI
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 func ToUntisDate(time time.Time) int {
 	year, month, day := time.Date()
@@ -17,7 +20,8 @@ func ToGoDate(value int) time.Time {
 }
 
 func ToUnitsTime(time time.Time) int {
-	return 0
+	value, _ :=strconv.Atoi(time.Format("1504"))
+	return value
 }
 
 func ToGoTime(value int) time.Time {
