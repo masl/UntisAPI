@@ -18,6 +18,9 @@ type User struct {
 	loginResp loginResp
 }
 
+/*
+NewUser returns a user based on the Login Credentials given which is necessary to use use the untisAPI
+*/
 func NewUser(username string, password string, school string, server string) *User {
 
 	schoolParts := splitAny(school, " +_")
@@ -59,6 +62,9 @@ type response struct {
 	Error   APIerror    `json:"error"`
 }
 
+/*
+request sends an API Request using the credentials from User.
+*/
 func (u *User) request(mehtode string, jsonParam interface{}) (response, error) {
 	url := u.server + "/WebUntis/jsonrpc.do" + "?school=" + u.school
 
@@ -118,6 +124,9 @@ type loginResp struct {
 	KlasseId   int
 }
 
+/*
+Login to Untis and get session cookie.
+*/
 func (u *User) Login() error {
 	response, err := u.request("authenticate", loginParam{
 		User:     u.username,
@@ -139,6 +148,9 @@ func (u *User) Login() error {
 	return nil
 }
 
+/*
+Logout tells Untis that you finished your requests.
+*/
 func (u *User) Logout() {
 	u.request("logout", nil)
 }

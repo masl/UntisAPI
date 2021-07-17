@@ -14,6 +14,10 @@ type Teacher struct {
 	//Dids []interface{}
 }
 
+/*
+GetTeachers downloads information about teachers from Untis.
+Returns a map from Teacher.Id to Teacher.
+*/
 func (u *User) GetTeachers() (map[int]Teacher, error) {
 	response, err := u.request("getTeachers", nil)
 	if err != nil {
@@ -44,6 +48,10 @@ type Student struct {
 	Gender   string
 }
 
+/*
+GetStudents downloads information about students from Untis.
+Returns a map from Student.Id to Student.
+*/
 func (u *User) GetStudents() (map[int]Student, error) {
 	response, err := u.request("getStudents", nil)
 	if err != nil {
@@ -74,6 +82,10 @@ type Class struct {
 	Teacher2 int
 }
 
+/*
+GetClasses downloads information about classes from Untis.
+Returns a map from Class.Id to Class.
+*/
 func (u *User) GetClasses() (map[int]Class, error) {
 	response, err := u.request("getKlassen", nil)
 	if err != nil {
@@ -103,13 +115,17 @@ type Subject struct {
 	Active        bool
 }
 
-func (u *User) GetSubjectes() (map[int]Subject, error) {
+/*
+GetSubjects downloads information about subjects from Untis.
+Returns a map from Class.Id to Class.
+*/
+func (u *User) GetSubjects() (map[int]Subject, error) {
 	response, err := u.request("getSubjects", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	subjectes := map[int]Subject{}
+	subjects := map[int]Subject{}
 	for _, data := range response.Result.([]interface{}) {
 
 		var subject Subject
@@ -118,10 +134,10 @@ func (u *User) GetSubjectes() (map[int]Subject, error) {
 			return nil, err
 		}
 
-		subjectes[subject.Id] = subject
+		subjects[subject.Id] = subject
 	}
 
-	return subjectes, nil
+	return subjects, nil
 }
 
 type Room struct {
@@ -132,6 +148,10 @@ type Room struct {
 	Active   bool
 }
 
+/*
+GetRooms downloads information about rooms from Untis
+Returns a map from Room.Id to Room
+*/
 func (u *User) GetRooms() (map[int]Room, error) {
 	response, err := u.request("getRooms", nil)
 	if err != nil {
@@ -153,36 +173,43 @@ func (u *User) GetRooms() (map[int]Room, error) {
 	return rooms, nil
 }
 
-type Schoolyear struct {
+type SchoolYear struct {
 	Name      string
 	StartDate int
 	EndDate   int
 }
 
-func (u *User) GetCurrentSchoolyear() (Schoolyear, error) {
+/*
+GetCurrentSchoolYear returns a SchoolYear
+*/
+func (u *User) GetCurrentSchoolYear() (SchoolYear, error) {
 	response, err := u.request("getCurrentSchoolyear", nil)
 	if err != nil {
-		return Schoolyear{}, err
+		return SchoolYear{}, err
 	}
 
-	var year Schoolyear
+	var year SchoolYear
 	err = mapstructure.Decode(response.Result, &year)
 	if err != nil {
-		return Schoolyear{}, err
+		return SchoolYear{}, err
 	}
 
 	return year, nil
 }
-func (u *User) GetSchoolyears() ([]Schoolyear, error) {
+
+/*
+GetSchoolYears returns a slice of all SchoolYears
+*/
+func (u *User) GetSchoolYears() ([]SchoolYear, error) {
 	response, err := u.request("getSchoolyears", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	var years []Schoolyear
+	var years []SchoolYear
 	for _, data := range response.Result.([]interface{}) {
 
-		var year Schoolyear
+		var year SchoolYear
 		err := mapstructure.Decode(data, &year)
 		if err != nil {
 			return nil, err
@@ -195,21 +222,25 @@ func (u *User) GetSchoolyears() ([]Schoolyear, error) {
 }
 
 type Period struct {
-	StartTime    int
+	StartTime    int // TODO use time.Time
 	ActivityType string
 	Id           int
 	Date         int
-	EndTime      int
+	EndTime      int // TODO use time.Time
 	Classes      []int
 	Subject      []int
 	Teacher      []int
 	Rooms        []int
 }
 
-func (u *User) GetTimeTable(id int, idtype int, startDate int, endDate int) (map[int]Period, error) {
+/*
+GetTimeTable returns a map from Period.Id to Period.
+TODO describe type
+*/
+func (u *User) GetTimeTable(id int, idType int, startDate int, endDate int) (map[int]Period, error) {
 	param := map[string]interface{}{
 		"id":        id,
-		"type":      idtype,
+		"type":      idType,
 		"startDate": startDate,
 		"endDate":   endDate,
 	}
@@ -247,6 +278,9 @@ func (u *User) GetTimeTable(id int, idtype int, startDate int, endDate int) (map
 	return periods, nil
 }
 
+/*
+GetPersonId returns the Student.Id or Teacher.Id of the given name.
+*/
 func (u *User) GetPersonId(firstname string, lastname string, isTeacher bool) (int, error) {
 	param := map[string]interface{}{
 		"fn":  firstname,
@@ -259,5 +293,8 @@ func (u *User) GetPersonId(firstname string, lastname string, isTeacher bool) (i
 		param["type"] = "5"
 	}
 	response, err := u.request("getPersonId", param)
+	if err != nil {
+		return -1, err
+	}
 	return int(response.Result.(float64)), err
 }
