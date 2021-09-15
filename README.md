@@ -55,6 +55,12 @@ user.Logout()
 ---
 To get the current time and date in Untis time format do this:
 ```Go
-date := UntisAPI.ToUntisDate(time.Now())
+untisDate := UntisAPI.ToUntisDate(time.Now())
+untisTime := UntisAPI.ToUntisTime(time.Now())
+```
+To convert it back do this:
+```Go
+goDate := UnitsAPI.ToGoDate(untisDate)
+goTime := UnitsAPI.ToGoTime(untisTime)
 ```
 
