@@ -234,8 +234,8 @@ type Period struct {
 }
 
 /*
-GetTimeTable returns a map from Period.Id to Period.
-TODO describe type
+GetTimeTable returns a map from Period.Id to Period in the specified time frame.
+idType: 1 = klasse, 2 = teacher, 3 = subject, 4 = room, 5 = student
 */
 func (u *User) GetTimeTable(id int, idType int, startDate int, endDate int) (map[int]Period, error) {
 	param := map[string]interface{}{
