@@ -1,4 +1,4 @@
-module UntisAPI
+module github.com/Stroby241/UntisAPI
 
 go 1.17
 
