@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/mitchellh/mapstructure"
 	"io/ioutil"
+	"mapstructure"
 	"net/http"
 )
 
