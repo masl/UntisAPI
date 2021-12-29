@@ -1,4 +1,4 @@
-module UnitsAPI
+module UntisAPI
 
 go 1.17
 
