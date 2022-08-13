@@ -2,7 +2,7 @@
 This project Provides a Golang wrapper for the WebUntis API. This Repo is still a work in progress. Therefore not all API features are avaliable. 
 
 **Attention**
-This Codebase is no longer maintained and could break over time. If you sumble upon this because you too want to access the horrible WebUntis API and are failing completely. Feel free to [Email](stroby241@gmail.com) me. :)  
+This Codebase is no longer maintained and could break over time. If you sumble upon this because you too want to access the horrible WebUntis API and are failing completely. Feel free to Email me. :) stroby241@gmail.com
 
 ## Features
 - Login / Logout
